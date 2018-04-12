@@ -1,3 +1,3 @@
 from fnet.functions import *
 from fnet.fnetlogger import FnetLogger
-from . import nn_modules
+from fnet.nn_modules import *
