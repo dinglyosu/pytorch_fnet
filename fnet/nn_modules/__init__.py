@@ -1,1 +1,1 @@
-from fnet_nn_3d import *
+from . import fnet_nn_3d
