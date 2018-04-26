@@ -4,6 +4,8 @@ import pdb
 import scipy
 import warnings
 import pdb
+import torch
+import json
 
 def normalize(img):
     """Subtract mean, set STD to 1.0"""
@@ -15,12 +17,41 @@ def normalize(img):
 def do_nothing(img):
     return img.astype(np.float)
 
+def prep_ndarray(img, model):
+    assert len(img.shape) == 3, "ndarray passed must be 3 dimensional"
+    
+    try:
+        opts = json.load(open(getattr(model, train_options)()))
+        transforms = opts['transform_signal']
+    except AttributeError, KeyError:
+        raise TypeError("provided model is missing train_options file")
+
+    for t in transforms:
+        func = eval(t)
+        img = func(img)
+
+    p = Propper()
+    img = p(img)
+
+    return img, p
+
+def ndarray_to_tensor(img):
+    assert len(img.shape) == 3, "ndarray passed must be 3 dimensional"
+
+    while len(img.shape) < 5:
+        img = img[np.newaxis]
+
+    return torch.Tensor(img)
+
+def tensor_to_ndarray(img):
+    return img.numpy()[0, 0, :]
+
 class Propper(object):
     """Padder + Cropper"""
-    
+
     def __init__(self, action='-', **kwargs):
         assert action in ('+', '-')
-        
+
         self.action = action
         if self.action == '+':
             self.transformer = Padder('+', **kwargs)
@@ -54,7 +85,7 @@ class Padder(object):
         self.padding = padding
         self.by = by
         self.mode = mode
-        
+
         self.pads = {}
         self.last_pad = None
 
@@ -92,7 +123,7 @@ class Padder(object):
             self.pads[shape_in] = pad_width
         self.last_pad = {'shape_in': shape_in, 'pad_width': pad_width, 'shape_out': x_out.shape}
         return x_out
-    
+
 
 class Cropper(object):
     def __init__(self, cropping, by=16, offset='mid', n_max_pixels=9732096):
@@ -101,7 +132,7 @@ class Cropper(object):
         self.offset = offset
         self.by = by
         self.n_max_pixels = n_max_pixels
-        
+
         self.crops = {}
         self.last_crop = None
 
@@ -182,7 +213,7 @@ class Cropper(object):
         x_out[slices] = x_in
         return x_out
 
-    
+
 class Resizer(object):
     def __init__(self, factors):
         """
@@ -193,7 +224,7 @@ class Resizer(object):
         return scipy.ndimage.zoom(x, (self.factors), mode='nearest')
 
     def __repr__(self):
-        return 'Resizer({:s})'.format(str(self.factors)) 
+        return 'Resizer({:s})'.format(str(self.factors))
 
 class ReflectionPadder3d(object):
     def __init__(self, padding):
@@ -203,7 +234,7 @@ class ReflectionPadder3d(object):
         padding - (int or tuple) size of the padding. If padding is an int, pad all dimensions by the same value. If
         padding is a tuple, pad the (z, y, z) dimensions by values specified in the tuple."""
         self._padding = None
-        
+
         if isinstance(padding, int):
             self._padding = (padding, )*3
         elif isinstance(padding, tuple):
@@ -218,7 +249,7 @@ class Capper(object):
     def __init__(self, low=None, hi=None):
         self._low = low
         self._hi = hi
-        
+
     def __call__(self, ar):
         result = ar.copy()
         if self._hi is not None:
@@ -230,7 +261,7 @@ class Capper(object):
     def __repr__(self):
         return 'Capper({}, {})'.format(self._low, self._hi)
 
-    
+
 def pad_mirror(ar, padding):
     """Pad 3d array using mirroring.
 
