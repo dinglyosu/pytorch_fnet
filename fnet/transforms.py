@@ -28,6 +28,9 @@ def prep_ndarray(img, model):
         raise TypeError("provided model is missing train_options file")
 
     for t in transforms:
+        if 'fnet.transforms.' in t:
+            t = t[len('fnet.transforms.'):]
+        
         func = eval(t)
         img = func(img)
 
