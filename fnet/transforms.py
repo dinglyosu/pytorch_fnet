@@ -30,14 +30,14 @@ def prep_ndarray(img, model):
     for t in transforms:
         if 'fnet.transforms.' in t:
             t = t[len('fnet.transforms.'):]
-        
+
         func = eval(t)
         img = func(img)
 
     p = Propper()
     img = p(img)
 
-    return img, p
+    return img
 
 def ndarray_to_tensor(img):
     assert len(img.shape) == 3, "ndarray passed must be 3 dimensional"
