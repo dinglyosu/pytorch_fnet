@@ -17,15 +17,9 @@ def normalize(img):
 def do_nothing(img):
     return img.astype(np.float)
 
-def prep_ndarray(img, model):
+def prep_ndarray(img, transforms):
     assert len(img.shape) == 3, "ndarray passed must be 3 dimensional"
-
-    try:
-        opts = json.load(open(getattr(model, 'train_options')()))
-        transforms = opts['transform_signal']
-    except (AttributeError, KeyError) as e:
-        print(e)
-        raise TypeError("provided model is missing train_options file")
+    assert isinstance(transforms, list), "list of function names"
 
     for t in transforms:
         if 'fnet.transforms.' in t:
