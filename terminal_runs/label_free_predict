@@ -61,8 +61,12 @@ def recurse_predict(p, model, transforms, struct, bright_i=-1):
                 os.mkdir(store)
 
             fn = store + curr_fn + "_" + struct + ".ome.tif"
-            predict_img(img, model, transforms, fn, bright_i)
-            print("Saved", struct, "prediction for", base_fn)
+            try:
+                predict_img(img, model, transforms, fn, bright_i)
+                print("Saved", struct, "prediction for", base_fn)
+            except Exception as e:
+                print("Failed", struct, "prediction for", base_fn)
+                print("Error:", e)
         else:
             print("Failed", struct, "prediction for", base_fn)
 
