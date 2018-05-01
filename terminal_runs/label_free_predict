@@ -33,7 +33,7 @@ def predict_img(img, model, transforms, fn, bright_i=-1):
     model_output = model.predict(model_input)
     predicted_out = fnet.transforms.tensor_to_ndarray(model_output)
 
-    writer = OmeTifWriter(path=fn)
+    writer = OmeTifWriter(fn)
     writer.save(predicted_out)
 
 def recurse_predict(p, model, transforms, struct, bright_i=-1):
