@@ -11,4 +11,5 @@ setup(name='pytorch_fnet',
       author_email='gregj@alleninstitute.org',
       url='https://github.com/AllenCellModeling/pytorch_fnet',
       packages=find_packages(exclude=['doc/*', 'docker/*', 'data/*', 'scripts/*', 'tests/*']),
+      scripts=["terminal_runs/label_free_predict"],
       install_requires=required)

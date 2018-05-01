@@ -1,0 +1,99 @@
+#!/bin/env python
+
+# Standard packages
+import os
+import math
+import json
+import numpy as np
+import matplotlib.pyplot as plt
+plt.set_cmap("gray")
+
+# For image data
+from aicsimage.io.cziReader import CziReader
+from aicsimage.io.omeTifReader import OmeTifReader
+from aicsimage.io.omeTifWriter import OmeTifWriter
+import scipy.ndimage
+
+# Download the model
+import torch
+import fnet
+import fnet.transforms
+
+# Model weights
+from quilt.data.aics import label_free
+
+import argparse
+
+# Function to predict an output image using the model provided
+def predict_img(img, model, transforms, fn, bright_i=-1):
+    # Prep the image for input into the model
+    full_b = img[:, bright_i,:,:]
+    img_in = fnet.transforms.prep_ndarray(full_b, transforms)
+    model_input = fnet.transforms.ndarray_to_tensor(img_in)
+
+    # Predict the lamin structure and convert back to ndarray
+    model_output = model.predict(model_input)
+    predicted_out = fnet.transforms.tensor_to_ndarray(model_output)
+
+    writer = OmeTifWriter(path=fn)
+    writer.save(predicted_out)
+
+def recurse_predict(p, model, transforms, struct, bright_i=-1):
+    if os.path.isdir(p):
+        for sub in os.listdir(p):
+            recurse_dir(sub)
+
+    elif os.path.isfile(p):
+        if p.endswith(".tif"):
+            reader = OmeTifReader(p)
+            okay = True
+        elif p.endswith(".czi"):
+            reader = CziReader(p)
+            okay = True
+
+        if okay:
+            img = reader.load()
+
+            store = os.path.dirname(p) + "/predictions/"
+            base_fn = os.path.basename(p)
+            curr_fn = base_fn.replace(".tif", "")
+            curr_fn = curr_fn.replace(".ome", "")
+            curr_fn = curr_fn.replace(".czi", "")
+            if not os.path.exists(store):
+                os.mkdir(store)
+
+            fn = store + curr_fn + "_" + struct + ".ome.tif"
+            predict_img(img, model, transforms, fn, bright_i)
+            print("Saved", struct, "prediction for", base_fn)
+        else:
+            print("Failed", struct, "prediction for", base_fn)
+
+    else:
+        print("Provided path (", p, ") is not a directory or file")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="CLI tool for generating label free predictions"
+    )
+
+    parser.add_argument(dest="config",
+                        help="path to the config file")
+    args = parser.parse_args()
+    opts = json.load(open(args.config))
+
+
+    model = fnet.fnet_model.Model()
+    which_struct = getattr(label_free, opts["structure"])
+    model_fn = which_struct.model()
+    model_opts = json.load(open(which_struct.train_options()))
+    model.load(model_fn, opts["gpu_ids"])
+
+    for p in opts["files"]:
+        recurse_predict(p,
+                        model,
+                        model_opts["transform_signal"],
+                        opts["structure"],
+                        opts["brightfield"])
+
+if __name__ == "__main__":
+    main()
