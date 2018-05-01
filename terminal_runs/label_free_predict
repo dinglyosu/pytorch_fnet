@@ -39,7 +39,7 @@ def predict_img(img, model, transforms, fn, bright_i=-1):
 def recurse_predict(p, model, transforms, struct, bright_i=-1):
     if os.path.isdir(p):
         for sub in os.listdir(p):
-            recurse_predict(sub, model, transforms, struct, bright_i)
+            recurse_predict(p + "/" + sub, model, transforms, struct, bright_i)
 
     elif os.path.isfile(p):
         if p.endswith(".tif"):
