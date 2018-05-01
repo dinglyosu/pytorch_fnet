@@ -1,7 +1,7 @@
 {
     "structure": "dna",
     "brightfield": -1,
-    "files":    [
+    "files": [
         "/allen/aics/modeling/jacksonb/test_predict/"],
     "gpu_ids": 0
 }
