@@ -2,6 +2,6 @@
     "structure": "dna",
     "brightfield": -1,
     "files":    [
-        "/allen/aics/microscopy/Data/RnD_Sandbox/3500001907/ZSD3/100X_zstack"],
+        "/allen/aics/modeling/jacksonb/test_predict/"],
     "gpu_ids": 0
 }

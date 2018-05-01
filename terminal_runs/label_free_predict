@@ -5,8 +5,6 @@ import os
 import math
 import json
 import numpy as np
-import matplotlib.pyplot as plt
-plt.set_cmap("gray")
 
 # For image data
 from aicsimage.io.cziReader import CziReader
