@@ -55,25 +55,28 @@ def recurse_predict(p, model, transforms, struct, bright_i=-1):
         fn = store + curr_fn + "_" + struct + ".ome.tif"
 
         if not os.path.exists(fn):
-            okay = False
-            if p.endswith(".tif"):
-                reader = OmeTifReader(p)
-                okay = True
-            elif p.endswith(".czi"):
-                reader = CziReader(p)
-                okay = True
+            try:
+                okay = False
+                if p.endswith(".tif"):
+                    reader = OmeTifReader(p)
+                    okay = True
+                elif p.endswith(".czi"):
+                    reader = CziReader(p)
+                    okay = True
 
-            if okay:
-                img = reader.load()
+                if okay:
+                    img = reader.load()
 
-                try:
-                    predict_img(img, model, transforms, fn, bright_i)
-                    print("Saved", struct, "prediction for", base_fn)
-                except Exception as e:
+                    try:
+                        predict_img(img, model, transforms, fn, bright_i)
+                        print("Saved", struct, "prediction for", base_fn)
+                    except Exception as e:
+                        print("Failed", struct, "prediction for", base_fn)
+                        print("Error:", e)
+                else:
                     print("Failed", struct, "prediction for", base_fn)
-                    print("Error:", e)
-            else:
-                print("Failed", struct, "prediction for", base_fn)
+            except MemoryError:
+                print("Failed", fn, "is too large a file...")
         else:
             print("Skipping", base_fn)
 
