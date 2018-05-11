@@ -1,5 +1,7 @@
 FROM pytorch/pytorch:v0.2
 
+RUN pip install --upgrade pip
+
 RUN apt update && apt install -y \
     libx11-6 \
     imagemagick \

@@ -26,20 +26,14 @@ import argparse
 def predict_img(img, models, transforms, fn, bright_i=-1):
     predictions = list()
 
-    print(img.shape)
-
     # Prep the image for input into the model
     img = img[:, bright_i,:,:]
     img = fnet.transforms.prep_ndarray(img, transforms)
     img = fnet.transforms.ndarray_to_tensor(img)
 
-    print(img.shape)
-
     for model in models:
-        print(model)
         # Predict the lamin structure and convert back to ndarray
         predicted = model.predict(img)
-        print(img.shape)
         predicted = fnet.transforms.tensor_to_ndarray(predicted)
 
         predictions.append(predicted)
