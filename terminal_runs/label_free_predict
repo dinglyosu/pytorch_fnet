@@ -31,9 +31,13 @@ def predict_img(img, models, transforms, fn, bright_i=-1):
     img = fnet.transforms.prep_ndarray(img, transforms)
     img = fnet.transforms.ndarray_to_tensor(img)
 
+    print(img)
+
     for model in models:
+        print(model)
         # Predict the lamin structure and convert back to ndarray
         img = model.predict(img)
+        print(img)
         img = fnet.transforms.tensor_to_ndarray(img)
 
         predictions.append(img)
