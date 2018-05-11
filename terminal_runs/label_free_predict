@@ -38,8 +38,11 @@ def predict_img(img, models, transforms, fn, bright_i=-1):
 
         predictions.append(predicted)
 
+    # predictions = [[Z, Y, X], [Z, Y, X], [Z, Y, X], [Z, Y, X]]
     predicted = np.stack(predictions)
+    # predicted = [C, Z, Y, X]
     predicted = np.swapaxes(predicted, 0, 1)
+    # predicted = [Z, C, Y, X]
 
     writer = OmeTifWriter(fn)
     writer.save(predicted, channel_names=list(models.keys()))
