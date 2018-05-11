@@ -26,6 +26,8 @@ import argparse
 def predict_img(img, models, transforms, fn, bright_i=-1):
     predictions = list()
 
+    print(img.shape)
+
     # Prep the image for input into the model
     img = img[:, bright_i,:,:]
     img = fnet.transforms.prep_ndarray(img, transforms)
@@ -36,11 +38,11 @@ def predict_img(img, models, transforms, fn, bright_i=-1):
     for model in models:
         print(model)
         # Predict the lamin structure and convert back to ndarray
-        img = model.predict(img)
+        predicted = model.predict(img)
         print(img.shape)
-        img = fnet.transforms.tensor_to_ndarray(img)
+        predicted = fnet.transforms.tensor_to_ndarray(predicted)
 
-        predictions.append(img)
+        predictions.append(predicted)
 
     writer = OmeTifWriter(fn)
     writer.save(np.stack(predictions))
