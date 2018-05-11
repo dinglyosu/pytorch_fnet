@@ -14,5 +14,5 @@ RUN quilt install \
 RUN pip install \
     git+https://github.com/AllenCellModeling/aicsimage.git
 
-RUN pip install --no-cache-dir --upgrade \
+RUN pip install --no-cache-dir --upgrade --force-reinstall --no-deps \
     git+https://github.com/JacksonMaxfield/pytorch_fnet.git
