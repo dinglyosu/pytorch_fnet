@@ -27,7 +27,11 @@ def predict_img(img, models, transforms, fn, bright_i=-1):
     predictions = list()
 
     # Prep the image for input into the model
-    img = img[:, bright_i,:,:]
+    if(len(img.shape) == 5):
+        img = img[0,:, bright_i,:,:]
+    else:
+        img = img[:, bright_i,:,:]
+        
     img = fnet.transforms.prep_ndarray(img, transforms)
     img = fnet.transforms.ndarray_to_tensor(img)
 
