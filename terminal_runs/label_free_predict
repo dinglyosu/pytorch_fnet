@@ -80,7 +80,8 @@ def recurse_predict(p, models, transforms, structs, bright_i=-1):
 
                 if okay:
                     img = reader.load()
-
+                    print(img.shape)
+                    
                     try:
                         predict_img(img, models, transforms, fn, bright_i)
                         print("Saved", structs, "prediction for", base_fn)
